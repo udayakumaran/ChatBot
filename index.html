@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <title>ChatBot</title>
+    <style>
+      * { padding: 0; box-sizing: border-box; }
+      body {
+        font: 19px Helvetica, Arial;
+        padding-left:20%;
+        padding-right:20%;
+      }
+      #f { background: #000; position: fixed; bottom: 1%; left:20%; right:20%; border:1px solid black; }
+      #f input { border: 2px black; width:80%; font-size:120%; }
+      #f button { background: rgb(130, 224, 255); border:2px solid black; margin-right:0; width:20%;font-size:120%;}
+      #messages { list-style-type: none; padding: 0; padding-bottom: 3%;}
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; text-align:right; }
+      #b1{
+       display: none;
+      }
+      a:link {
+        color: red;
+      }
+
+      /* visited link */
+      a:visited {
+        color: green;
+      }
+
+      /* mouse over link */
+      a:hover {
+        color: hotpink;
+      }
+
+      /* selected link */
+      a:active {
+        color: blue;
+      }
+    </style>
+
+  </head>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+      
+      $(function () {
+        var flag;
+        var order = "";
+        var socket = io();
+        let v = Math.floor((Math.random() * 10000) + 1);
+        $('#b1').click(function(){ $('#m').val("Cheese Pizza"); $('#b1').hide(); });
+        $('form').submit(function(e){
+          e.preventDefault(); // prevents page reloading
+
+            socket.emit("chat message", $('#m').val()); 
+
+          $('#m').val('');
+          return false;
+        });
+        socket.on('chat message', function(msg){
+          $('#messages').append($('<li>'+msg+'</li>'));
+          
+            if(flag === 1)
+            {
+              const data = { name: 'example' };
+                let str = msg;
+                let newStr = str.replace(/my name is /g,'');
+//                 getData()
+//                 async function getData() {
+//                 response = await fetch('/pizza1', {
+//   method: 'POST', 
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify(data),
+// })
+//                 console.log(data)
+//                 }
+                console.log( v )
+                console.log(newStr);
+                flag=0;
+            }
+            if(flag === 2)
+            {
+                var urlRE= new RegExp("[^MY ADDRESS IS]*$");    
+                var match = urlRE.exec(msg);
+                console.log(match[0])
+                console.log(v )
+                flag=0;
+            }
+            if(flag === 3)
+            {
+              let newStr = msg.replace(/Quantity of/g,'');
+              order += newStr + ","
+              console.log(order)
+              flag = 0;
+            }
+
+            if(msg === "your name?")
+             flag = 1;
+            if(msg === "your address?")
+                flag = 2; 
+            if(msg.search("need") >= 0)
+                flag = 3; 
+
+
+            if(msg === "Veg Pizza")
+            {
+                $('#b1').show();
+                order += "V"
+
+            }
+            if(msg === "Non-Veg Pizza")
+                order += "NV"
+              
+            if(msg === "Cheese Pizza")
+              order += "chesse"
+            if(msg === "Chilly Pizza")
+              order += "chilly"
+
+            if(msg === "Regular")
+              order += " R"
+              if(msg === "Medium")
+              order += " M"
+              if(msg === "Large")
+              order += " L"
+              
+            
+             });     
+
+      });
+  </script>
+
+
+  <body>
+          <ul id="messages">
+            <li></li>
+          </ul>
+          <form action="" id="f">
+            <input id="m" /><button type="submit">Send</button>
+          </form>
+          <input type="submit" id="b1" value="B1" />
+  </body>
